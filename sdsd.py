@@ -85,48 +85,93 @@ elif st.session_state.page == "Dashboard":
     st.title("📊 Data Science Dashboard")
     st.subheader("📂 Upload a CSV File")
     file = st.file_uploader("Choose a CSV file", type=["csv"], key="dashboard_uploader")
+
+    df = None  # Important to prevent undefined variable error
+
     if file:
-        st.session_state.df = pd.read_csv(file)
-        st.success("✅ File Uploaded Successfully")
-    df = st.session_state.df
+        try:
+            df = pd.read_csv(file)
+            st.session_state.df = df
+            st.success("✅ File Uploaded Successfully")
+        except Exception as e:
+            st.error(f"❌ Failed to read CSV: {str(e)}")
+
+    elif st.session_state.df is not None:
+        df = st.session_state.df
+
     if df is not None:
         st.subheader("📑 Raw Data")
         st.dataframe(df, use_container_width=True)
+
         st.subheader("Dataset Summary")
+        col = len(df.columns)
         col1, col2 = st.columns(2)
         with col1:
             st.write("**Shape:**", df.shape)
             st.write("**Memory Usage:**", f"{df.memory_usage().sum() / 1024:.1f} KB")
+            st.write(f"{col} columns")
         with col2:
             st.write("**Data Types:**")
             st.write(df.dtypes.value_counts())
+
         st.subheader("📈 Data Visualization")
         columns = df.select_dtypes(include=["number"]).columns.tolist()
-        if len(columns) >= 2:
-            x_axis = st.selectbox("X-Axis", options=columns, key="dashboard_x")
-            y_axis = st.selectbox("Y-Axis", options=columns, index=1, key="dashboard_y")
-            chart_type = st.radio("Chart Type", ["Bar", "Scatter", "Line", "Polar", "Histogram", "Pie"], key="dashboard_chart")
-            try:
-                if chart_type == "Bar":
-                    fig = px.bar(df, x=x_axis, y=y_axis)
-                elif chart_type == "Scatter":
-                    fig = px.scatter(df, x=x_axis, y=y_axis)
-                elif chart_type == "Line":
-                    fig = px.line(df, x=x_axis, y=y_axis)
-                elif chart_type == "Polar":
-                    fig = px.bar_polar(df, r=y_axis, theta=x_axis)
-                elif chart_type == "Histogram":
-                    fig = px.histogram(df, nbins=11, x=x_axis, marginal='violin')
-                elif chart_type == "Pie":
-                    fig = px.pie(df, names=x_axis, values=y_axis)
-                st.plotly_chart(fig, use_container_width=True)
-            except Exception as e:
-                st.error(f"Error creating chart: {str(e)}")
-        else:
-            st.warning("Please upload a CSV with at least 2 numeric columns for visualization.")
-    else:
-        st.info("Upload a CSV file to get started.")
 
+        if len(columns) < 1:
+            st.warning("❗ This CSV doesn't have numeric columns for charting.")
+        else:
+            cols = st.selectbox("Number of Columns", options=[1, 2, 3], key="dashboard_cols")
+
+            if cols == 1:
+                data = st.selectbox("Select Column", options=columns, key="dashboard_col_1")
+                chart_type = st.selectbox("Select Chart Type", ["Histogram", "Pie"])
+                try:
+                    if chart_type == "Histogram":
+                        fig = px.histogram(df, nbins=11, x=data, marginal='violin')
+                    elif chart_type == "Pie":
+                        fig = px.pie(df, names=data)
+                    st.plotly_chart(fig, use_container_width=True)
+                except Exception as e:
+                    st.error(f"Error creating chart: {str(e)}")
+
+            elif cols == 2 and len(columns) >= 2:
+                data1 = st.selectbox("Select Column 1", options=columns, key="dashboard_col2_1")
+                data2 = st.selectbox("Select Column 2", options=columns, key="dashboard_col2_2")
+                chart_type = st.selectbox("Select Chart Type", ["Scatter", "Line", "Box", "Bar", "Polar"])
+                try:
+                    if chart_type == "Scatter":
+                        fig = px.scatter(df, x=data1, y=data2)
+                    elif chart_type == "Line":
+                        fig = px.line(df, x=data1, y=data2)
+                    elif chart_type == "Box":
+                        fig = px.box(df, x=data1, y=data2)
+                    elif chart_type == "Bar":
+                        fig = px.bar(df, x=data1, y=data2)
+                    elif chart_type == "Polar":
+                        fig = px.bar_polar(df, r=data2, theta=data1)
+                    st.plotly_chart(fig, use_container_width=True)
+                except Exception as e:
+                    st.error(f"Error creating chart: {str(e)}")
+
+            elif cols == 3 and len(columns) >= 3:
+                data1 = st.selectbox("Select Column 1", options=columns, key="dashboard_col3_1")
+                data2 = st.selectbox("Select Column 2", options=columns, key="dashboard_col3_2")
+                data3 = st.selectbox("Select Column 3", options=columns, key="dashboard_col3_3")
+                chart_type = st.selectbox("Select Chart Type", ["Density Heatmap", "3D Scatter", "Area Chart"])
+                try:
+                    if chart_type == "3D Scatter":
+                        fig = px.scatter_3d(df, x=data1, y=data2, z=data3)
+                    elif chart_type == "Density Heatmap":
+                        fig = px.density_heatmap(df, x=data1, y=data2, z=df[data3], histfunc='avg', color_continuous_scale='Viridis')
+                    elif chart_type == "Area Chart":
+                        fig = px.area(df, x=data1, y=[data2, data3])
+                    st.plotly_chart(fig, use_container_width=True)
+                except Exception as e:
+                    st.error(f"Error creating chart: {str(e)}")
+            else:
+                st.warning("📌 Select appropriate number of numeric columns for this plot type.")
+    else:
+        st.info("📁 Please upload a valid CSV file to begin.")
 # -------------------- TIMER PAGE (was DASHBOARD) --------------------
 elif st.session_state.page == "Timer":
     st.title("⏱ Interactive Countdown Timer")
