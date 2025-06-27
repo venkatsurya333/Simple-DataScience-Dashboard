@@ -1,0 +1,42 @@
+**Project:** SIMPLE_DATASCIENCE_DASHBOARD  
+A lightweight, interactive Streamlit dashboard for performing basic data science tasks such as exploratory data analysis (EDA), visualization, and statistical summary — designed for simplicity and ease of use by data enthusiasts and beginners.
+
+---
+
+
+## [1.1.0] - 22-06-2025
+### Added
+- 📁 Support for **CSV file uploads**, enabling dynamic dataset analysis without code.
+- 📊 Integration of **data profiling tools** using `pandas-profiling` / `ydata-profiling` to auto-generate summaries including missing values, distributions, and correlations.
+- 🧮 A **statistics panel** showing core metrics like mean, median, mode, standard deviation, and value counts.
+- 📈 A **visualization tab** that includes:
+  - Histogram plotting for numeric columns
+  - Scatter plots for bivariate analysis
+  - Correlation matrix with heatmap-style rendering
+
+### Changed
+- 🔄 **Upgraded Streamlit** to the latest stable version for enhanced component rendering and fewer compatibility warnings.
+- 💻 **Improved UI layout** and responsiveness for mobile and tablet screens; spacing and sidebar width dynamically adjust to screen size.
+- 🎨 Polished styling of charts and tables for cleaner display and readability.
+
+---
+
+## [1.0.1] - 18-06-2025
+### Fixed
+- 🐛 Resolved issue causing **dashboard crash** on uploading large or malformed CSV files.
+- 🔢 Corrected **number formatting inconsistencies** in the summary statistics display for float and integer columns.
+- 🧪 Minor backend improvements for handling empty datasets more gracefully.
+
+---
+
+## [1.0.0] - 10-06-2025
+### Added
+- 🚀 Initial version launch of the **SIMPLE_DATASCIENCE_DASHBOARD** application.
+- 🧱 Structured layout with **Streamlit sidebar navigation** to switch between data overview and analysis tools.
+- 👓 Display of:
+  - Head and tail of the uploaded dataset
+  - Data types, shape, and basic info for each column
+- 📦 Basic file upload handling with data preview panel.
+
+---
+
